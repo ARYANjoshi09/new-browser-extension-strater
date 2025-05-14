@@ -1,4 +1,5 @@
-import { Dropdown, Input, Menu, message, Modal } from "antd"
+import { Dropdown, Input, Menu, message, Modal, Skeleton } from "antd"
+import { LoaderCircle, Star } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { CiMenuKebab } from "react-icons/ci"
 import { FaRegEye } from "react-icons/fa"
@@ -21,11 +22,14 @@ interface BookmarkData {
 const Bookmark = () => {
   const [bookmarks, setBookmarks] = useState<BookmarkData[]>([])
   const [expandedCard, setExpandedCard] = useState<string | null>(null) // State to track the expanded card
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchBookmarks = async () => {
+      setLoading(true)
       const savedBookmarks = (await storage.get("bookmarks")) as BookmarkData[]
       setBookmarks(savedBookmarks || [])
+      setLoading(false)
     }
 
     fetchBookmarks()
@@ -107,9 +111,12 @@ const Bookmark = () => {
   return (
     <>
       <h1 className="text-3xl font-bold text-white mb-4">Bookmarks</h1>
-      <div className="flex items-center justify-center w-full h-full">
-      <div className="w-full flex flex-col justify-center items-center gap-2 ">
-        {bookmarks.length > 0 ? (
+      <div className="w-full flex flex-col justify-center items-center mt-4">
+        {loading ? (
+          <div className="flex items-center justify-center w-full">
+            <LoaderCircle className="w-6 h-6 text-white animate-spin" />
+          </div>
+        ) : bookmarks.length > 0 ? (
           Object.keys(bookmarksByVideoId).map((videoId) => (
             <BookmarkCard
               key={videoId}
@@ -125,13 +132,13 @@ const Bookmark = () => {
             />
           ))
         ) : (
-          <div className="flex items-center w-full rounded-lg overflow-hidden shadow-md bg-zinc-900 p-8 cursor-pointer">
-            <span className="text-xl text-gray-200 ml-4">
-              No bookmarks added yet.
+          <div className="flex flex-col items-center w-full rounded-lg overflow-hidden shadow-md bg-zinc-900 p-8 cursor-pointer">
+            <Star className="w-12 h-12 text-white/20" />
+            <span className="text-xl text-gray-200 mt-2">
+              You haven't added any bookmarks yet.
             </span>
           </div>
         )}
-      </div>
       </div>
     </>
   )
@@ -195,6 +202,8 @@ const BookmarkCard = ({
         onClick={() => {
           setIsDeleteModalVisible(true)
           setCurrentBookmark(bookmark)
+          setIsDeleteModalVisible(true)
+          setCurrentBookmark(bookmark)
         }}>
         Remove
       </Menu.Item>
@@ -231,24 +240,19 @@ const BookmarkCard = ({
         {isExpanded && (
           <div className="max-h-96 overflow-y-auto bg-zinc-800/90 rounded-b-lg border border-zinc-700 shadow-lg">
             {bookmarks.map((bookmark) => (
-              <div className="flex items-center justify-between w-full p-4 border-t border-zinc-800 hover:bg-zinc-800/50 transition-all duration-300 cursor-pointer">
-                <span className="text-white font-medium truncate">
-                  {bookmark.name}
-                </span>
-                <div className="flex items-center gap-2">
+              <Dropdown
+                key={bookmark.id}
+                overlay={getBookmarkMenu(bookmark)}
+                trigger={["contextMenu"]}>
+                <div className="flex items-center justify-between w-full p-4 border-t border-zinc-800 hover:bg-zinc-800/50 transition-all duration-300 cursor-pointer">
+                  <span className="text-white font-medium truncate">
+                    {bookmark.name}
+                  </span>
                   <span className="font-medium text-white bg-[#ff0042] rounded-full px-3 py-1 text-sm shadow-sm">
                     {formatTime(bookmark.time)}
                   </span>
-                  <Dropdown
-                    key={bookmark.id}
-                    overlay={getBookmarkMenu(bookmark)}
-                    trigger={["hover"]}>
-                    <span>
-                      <CiMenuKebab className="text-2xl cursor-pointer" />
-                    </span>
-                  </Dropdown>
                 </div>
-              </div>
+              </Dropdown>
             ))}
           </div>
         )}

@@ -30,6 +30,8 @@ import { v4 as uuidv4 } from "uuid"
 
 import { sendToBackground } from "@plasmohq/messaging"
 
+import { EXTENSION_ID } from "~constants"
+
 dayjs.extend(duration)
 
 interface ScheduleItem {
@@ -65,7 +67,8 @@ const WatchVideoButtons = () => {
   const videoTitle = (
     videoTitleParentDiv.children[0].children[1] as HTMLElement
   ).innerText
-  const trunctedVideoTitle = videoTitle.length > 30 ? videoTitle.slice(0, 20) + "..." : videoTitle
+  const trunctedVideoTitle =
+    videoTitle.length > 30 ? videoTitle.slice(0, 20) + "..." : videoTitle
 
   const getCurrentVideoId = () => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -131,7 +134,7 @@ const WatchVideoButtons = () => {
             action: "ADD_SCHEDULE",
             data: scheduleItems
           },
-          extensionId: "aodjmfiabicdmbnaaeljcldpamjimmff"
+          extensionId: EXTENSION_ID
         })
         if (response.success) {
           console.log(
@@ -181,14 +184,14 @@ const WatchVideoButtons = () => {
         <Modal
           title={
             <div className="flex flex-col items-start px-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[#ff0042] mr-2">
-                <YoutubeOutlined style={{ fontSize: "20px" }} />
-              </span>
-              <span>Schedule for Later</span>
-            </div>
-              <div className="w-full border-t border-zinc-700 my-4"></div>
+              <div className="flex items-center gap-2">
+                <span className="text-[#ff0042] mr-2">
+                  <YoutubeOutlined style={{ fontSize: "20px" }} />
+                </span>
+                <span>Schedule for Later</span>
               </div>
+              <div className="w-full border-t border-zinc-700 my-4"></div>
+            </div>
           }
           closeIcon={<CloseOutlined />}
           zIndex={999999999999}
@@ -205,12 +208,22 @@ const WatchVideoButtons = () => {
               ?.shadowRoot?.querySelector("#plasmo-shadow-container")
           }>
           <Form form={form} layout="vertical" className="pt-4">
-            <Form.Item name="title" label="Task title" className="mb-6" initialValue={trunctedVideoTitle}  rules={[
+            <Form.Item
+              name="title"
+              label="Task title"
+              className="mb-6"
+              initialValue={trunctedVideoTitle}
+              rules={[
                 { required: true, message: "Please enter a task title" }
               ]}>
               <Input
                 onKeyDown={handleInputKeyDown}
-                prefix={<YoutubeOutlined className="mr-2" style={{ color: "#ff0042" }} />}
+                prefix={
+                  <YoutubeOutlined
+                    className="mr-2"
+                    style={{ color: "#ff0042" }}
+                  />
+                }
                 defaultValue={trunctedVideoTitle}
                 className="rounded-lg"
                 placeholder="Task title"
@@ -222,7 +235,8 @@ const WatchVideoButtons = () => {
                 name="date"
                 label="Date"
                 initialValue={dayjs()}
-                className="mb-0" rules={[{ required: true, message: "Please select a date" }]}>
+                className="mb-0"
+                rules={[{ required: true, message: "Please select a date" }]}>
                 <DatePicker
                   className="w-full rounded-lg"
                   format="DD-MM-YYYY"
@@ -236,7 +250,11 @@ const WatchVideoButtons = () => {
                 />
               </Form.Item>
 
-              <Form.Item name="time" label="Time" className="mb-0" rules={[{ required: true, message: "Please select a time" }]}>
+              <Form.Item
+                name="time"
+                label="Time"
+                className="mb-0"
+                rules={[{ required: true, message: "Please select a time" }]}>
                 <TimePicker
                   className="w-full rounded-lg"
                   getPopupContainer={() =>
@@ -248,46 +266,46 @@ const WatchVideoButtons = () => {
                   suffixIcon={<ClockCircleOutlined />}
                 />
               </Form.Item>
-            <Form.Item
-              label="Duration"
-              name="duration"
-              rules={[
-                { required: true, message: "Please enter the duration" }
-              ]}>
-              <InputNumber
-               className="rounded-lg w-full"
-                min={15}
-                max={240}
-                placeholder="Enter duration in minutes"
+              <Form.Item
+                label="Duration"
+                name="duration"
+                rules={[
+                  { required: true, message: "Please enter the duration" }
+                ]}>
+                <InputNumber
+                  className="rounded-lg w-full"
+                  min={15}
+                  max={240}
+                  placeholder="Enter duration in minutes"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="status"
+                label="Status"
+                rules={[{ required: true, message: "Please select a status" }]}>
+                <Select
+                  className="rounded-lg w-full"
+                  getPopupContainer={() =>
+                    document
+                      .getElementById("take-note-csui")
+                      ?.shadowRoot?.querySelector("#plasmo-shadow-container")
+                  }
+                  placeholder="Select status">
+                  <Select.Option value="Upcoming">Upcoming</Select.Option>
+                  <Select.Option value="In Progress">In Progress</Select.Option>
+                  <Select.Option value="Completed">Completed</Select.Option>
+                </Select>
+              </Form.Item>
+            </div>
+            <Form.Item hidden name="video" label="Video Id">
+              <Input
+                className="rounded-lg w-full"
+                defaultValue={videoId}
+                disabled
+                placeholder="Video Id"
               />
             </Form.Item>
-
-            <Form.Item
-              name="status"
-              
-              label="Status"
-              rules={[{ required: true, message: "Please select a status" }]}>
-              <Select
-              className="rounded-lg w-full"
-                getPopupContainer={() =>
-                  document
-                    .getElementById("take-note-csui")
-                    ?.shadowRoot?.querySelector("#plasmo-shadow-container")
-                }
-                placeholder="Select status">
-                <Select.Option value="Upcoming">Upcoming</Select.Option>
-                <Select.Option value="In Progress">In Progress</Select.Option>
-                <Select.Option value="Completed">Completed</Select.Option>
-              </Select>
-            </Form.Item>
-
-            </div>
-            <Form.Item hidden
-              name="video"
-              label="Video Id">
-             <Input className="rounded-lg w-full" defaultValue={videoId} disabled placeholder="Video Id"/>
-            </Form.Item>
-
           </Form>
           <div className="flex items-center text-xl text-gray-400 mb-2">
             <ClockCircleOutlined className="mr-2 text-2xl text-[#ff0042]/90" />
