@@ -133,7 +133,6 @@ const Bookmark = () => {
           )}
         </div>
       </div>
-      </div>
     </>
   )
 }
