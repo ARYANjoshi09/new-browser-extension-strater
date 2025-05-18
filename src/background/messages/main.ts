@@ -18,7 +18,7 @@
 
 
 import type { PlasmoMessaging } from "@plasmohq/messaging";
-import { apiRequest } from "../../../utils/api";
+// import { apiRequest } from "../../../utils/api";
 
 // export type RequestBody = {
 //   action: string; // Action to perform
